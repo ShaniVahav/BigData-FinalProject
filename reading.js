@@ -1,3 +1,4 @@
+/* Initialize the array with 100 cities */
 var file = 'cities.txt';
 const fs = require('fs');
 fs.readFile('cities.txt', 'utf8', (err, data) => {
@@ -7,3 +8,8 @@ fs.readFile('cities.txt', 'utf8', (err, data) => {
     }
     var fileArray = data.split(/\r\n|\n/);
 })
+
+/* Produce random sales for Kafka */
+
+
+
