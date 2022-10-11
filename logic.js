@@ -1,73 +1,72 @@
-const fetch = (...args) =>
-  import('node-fetch').then(({ default: fetch }) => fetch(...args));
-
-const _axios = (...args) =>
-  import('axios').then(({ default: axios }) => _axios(...args));
-// axios
 //********************************************//
 //   Initialize the array with 100 cities    //
 //******************************************//
-var file = 'cities.txt';
-const fs = require('fs');
-fs.readFile('cities.txt', 'utf8', (err, data) => {
-    if(err){
-        console.error(err);
-        return;
-    }
-    var fileArray = data.split(/\r\n|\n/);
-})
+const fs = require('fs')
+
+holidays_url = 'https://holidayapi.com/v1/holidays?pretty&key=6494e84f-c91d-4794-bbf1-abd52c1d760d&country=IL&year=2021'
+cities_url = 'https://data.gov.il/api/3/action/datastore_search?resource_id=5c78e9fa-c2e2-4771-93ff-7f400a12f7ba&limit=101'
+
+
+/* Load the data through API into .txt file */
+var citiesArray = []
+var holidaysArray = []
+
+
+function create_Arrays()
+{
+    // fetch the cities:
+    fetch(cities_url)
+    .then(res => { return res.json() })
+    .then(data => { return data.result.records })
+    .then(city => city.forEach(element => { return citiesArray.push(element.שם_ישוב) }))
+
+    // fetch the holidays:
+    fetch(holidays_url)
+    .then(res => { return res.json() })
+    .then(data => { return data.holidays })
+    .then(city => city.forEach(element => { holidaysArray.push(element.name) }))
+}
+create_Arrays()
+
+setTimeout(Sale, 1000)
+
 
 //*************************************//
 //   Produce random sales for Kafka   //
 //***********************************//
 
-/* Random Date */
-// inspire from: https://stackoverflow.com/questions/9035627/elegant-method-to-generate-array-of-random-dates-within-two-dates
-function randomDate(start, end) {
-    var date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-    return date.getDate()+'/'+(date.getMonth()+1)+'/' +date.getFullYear() +" "+ (date.getDay()+1);
-  }
-  const d = randomDate(new Date(2021, 0, 1), new Date());
-  // console.log(d);
-
-//  const holidays_url = 'https://www.hebcal.com/hebcal?v=1&cfg=json&maj=on&min=on&mod=on&nx=on&year=now&month=x&ss=on&mf=on&c=on&geo=geoname&geonameid=3448439&M=on&s=on';
-//  async function getData(){
-//     // const response = await fetch(holidays_url);
-//     const response = await axios.get(holidays_url);
-//     const data = await response.json();  // convert the data to json format
-//     console.log(data);
-//  }
-
-//  getData();
-
- async function getWeather(lat,lon)
+function Sale()
 {
-    const params = {
-        appid : 'fc72ac8663a15a5fad6f1e5f8d866337',
-        lat : lat,
-        lon : lon
+    /* Random Date */
+    function randomDate() {
+        start = new Date(2021, 0, 1)
+        end = new Date()
+        var date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+        return date.getDate()+'/'+(date.getMonth()+1)+'/' +date.getFullYear() +" "+ (date.getDay()+1);
     }
-    writeToDb("api.openweathermap")
-    try {
-        const response = await axios.get('https://api.openweathermap.org/data/2.5/weather',{params})
-        return[response.data]
+    var _date = randomDate();
+
+    /* Random City */
+    function randomCity() {
+        return Math.floor(Math.random() * 101) + 1;
     }
-    catch (err)
-    {
-        console.log("error at get weather")
+    var _city = randomCity()
+
+    /* Random Flavour */
+    var flavour = ['chocolate', 'vanilla', 'oreo', 'strawberry', 'berries']
+    function randomFlavour() {
+        return Math.floor(Math.random() * 5) + 0;
     }
+    var _flv = randomFlavour()
+
+    /* Random Weight */
+    function randomWeight() {
+        kg = Math.floor(Math.random() * 5) + 0;
+        g = Math.floor(Math.random() * 1001) + 100;
+        return kg+(g/100)
+    }
+    var _w = randomWeight()
+
+    randomSale = `Date: ${_date}, City: ${citiesArray[_city]}, Flavour: ${flavour[_flv]}, Weight: ${_w}`;
+    console.log(randomSale)
 }
-
-getWeather(12,12);
-
-// fetch()
-//     .then(res => {
-//         if(res.ok){
-//             console.log('SUCCESS');
-//         }
-//             else{
-//                 console.log('NOT SUCCESS');
-//             }
-//         })
-//     .then(data => console.log(data))
-//     .catch(error => console.log('ERROR'))
