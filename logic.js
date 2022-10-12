@@ -1,41 +1,18 @@
-//********************************************//
-//   Initialize the array with 100 cities    //
-//******************************************//
-const fs = require('fs')
+// import { fetch_cities, fetch_holidays } from './fetchingData.mjs'
+const _fetch = require('./fetchingData.js')
+//*************//
+//   Arrays   //
+//***********//
 
-holidays_url = 'https://holidayapi.com/v1/holidays?pretty&key=6494e84f-c91d-4794-bbf1-abd52c1d760d&country=IL&year=2021'
-cities_url = 'https://data.gov.il/api/3/action/datastore_search?resource_id=5c78e9fa-c2e2-4771-93ff-7f400a12f7ba&limit=101'
-
-
-/* Load the data through API into .txt file */
-var citiesArray = []
-var holidaysArray = []
-
-
-function create_Arrays()
-{
-    // fetch the cities:
-    fetch(cities_url)
-    .then(res => { return res.json() })
-    .then(data => { return data.result.records })
-    .then(city => city.forEach(element => { return citiesArray.push(element.שם_ישוב) }))
-
-    // fetch the holidays:
-    fetch(holidays_url)
-    .then(res => { return res.json() })
-    .then(data => { return data.holidays })
-    .then(city => city.forEach(element => { holidaysArray.push(element.name) }))
-}
-create_Arrays()
-
-setTimeout(Sale, 1000)
+var citiesArray = _fetch.cities()
+var holidaysArray = _fetch.holidays()
 
 
 //*************************************//
 //   Produce random sales for Kafka   //
 //***********************************//
 
-function Sale()
+exports.sale = function Sale()
 {
     /* Random Date */
     function randomDate() {
@@ -55,18 +32,17 @@ function Sale()
     /* Random Flavour */
     var flavour = ['chocolate', 'vanilla', 'oreo', 'strawberry', 'berries']
     function randomFlavour() {
-        return Math.floor(Math.random() * 5) + 0;
+        return Math.floor(Math.random() * 5);
     }
     var _flv = randomFlavour()
 
     /* Random Weight */
     function randomWeight() {
-        kg = Math.floor(Math.random() * 5) + 0;
-        g = Math.floor(Math.random() * 1001) + 100;
-        return kg+(g/100)
+        kg = Math.floor(Math.random() * 5);
+        g = Math.floor(Math.random() * 10);
+        return kg+(g/10)
     }
     var _w = randomWeight()
 
-    randomSale = `Date: ${_date}, City: ${citiesArray[_city]}, Flavour: ${flavour[_flv]}, Weight: ${_w}`;
-    console.log(randomSale)
+    return randomSale = `Date: ${_date}, City: ${citiesArray[_city]}, Flavour: ${flavour[_flv]}, Weight: ${_w}`;
 }
