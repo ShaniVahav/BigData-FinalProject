@@ -1,50 +1,65 @@
 // https://www.cloudkarafka.com/ הפעלת קפקא במסגרת ספק זה
 
+//*********************//
+//   Create & Send    //
+//*******************//
 const create = require('./logic.js');
-let sale = create.sale()
-setTimeout(printme, 1000)
-function printme(){
-  console.log(sale);
+var Kafka = require('node-rdkafka');
+
+
+let sale = ""
+let cities = create.cities()
+let holidays = create.holidays()
+setTimeout(send, 1000)
+
+function send() {
+
+    const prefix = "ee2dx8wc-";
+    const topic = `${prefix}default`;
+
+    var producer = new Kafka.Producer({
+        "group.id": "kafka",
+        "metadata.broker.list": "dory-01.srvs.cloudkafka.com:9094,dory-02.srvs.cloudkafka.com:9094,dory-03.srvs.cloudkafka.com:9094".split(","),
+        "socket.keepalive.enable": true,
+        "security.protocol": "SASL_SSL",
+        "sasl.mechanisms": "SCRAM-SHA-256",
+        "sasl.username": "ee2dx8wc",
+        "sasl.password": "FdwQahINPP-hPRNkFEZXtTWhAREbabmt",
+        "debug": "generic,broker,security"
+    });
+
+    var genMessage = Buffer.from("");
+
+    producer.on("ready", function (arg) {
+
+        console.log('producer is ready');
+
+        sale = create.sale(cities, holidays)
+        genMessage = Buffer.from(sale);
+
+        producer.produce(topic, -1, genMessage);
+        setTimeout(() => producer.disconnect(), 0);
+    })
+
+    myLoop()
+
+    var i = 0;
+    function ready() {
+        i++
+        if (i < 50) myLoop();
+        producer.connect()
+    }
+
+    function myLoop() {
+        setTimeout(ready, 2000)
+    }
+
+
+    producer.on('event.error', function (err) {
+        console.log("event.error")
+        console.error(err);
+        process.exit(1);
+    });
+
+   // producer.connect();
 }
-
-// const Kafka = require("node-rdkafka");
-
-
-// const kafkaConf = {
-//   "group.id": "cloudkarafka-example",
-//   "metadata.broker.list": "dory-01.srvs.cloudkafka.com:9094,dory-02.srvs.cloudkafka.com:9094,dory-03.srvs.cloudkafka.com:9094".split(","),
-//   "socket.keepalive.enable": true,
-//   "security.protocol": "SASL_SSL",
-//   "sasl.mechanisms": "SCRAM-SHA-256",
-//   "sasl.username": "ee2dx8wc",
-//   "sasl.password": "KxLA0Fa8_H_VH_lSAw21bhD4bGqqUp9V",
-//   "debug": "generic,broker,security"
-// };
-
-// const prefix = 'ee2dx8wc-';
-// const topic = `${prefix}default`;
-// const producer = new Kafka.Producer(kafkaConf);
-// const maxMessages = 20;
-
-// const genMessage = new Buffer/(`{"id":1, "message":"hi"}`);
-
-// producer.on("ready", function(arg) {
-//   console.log(`producer ${arg.name} ready.`);
-//   for (var i = 0; i < maxMessages; i++) {
-//     producer.produce(topic, -1, genMessage(i), i);
-//   }
-//   setTimeout(() => producer.disconnect(), 0);
-// });
-
-// producer.on("disconnected", function(arg) {
-//   process.exit();
-// });
-
-// producer.on('event.error', function(err) {
-//   console.error(err);
-//   process.exit(1);
-// });
-// // producer.on('event.log', function(log) {
-// //   console.log(log);
-// // });
-// producer.connect();
