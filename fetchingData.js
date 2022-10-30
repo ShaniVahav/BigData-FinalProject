@@ -12,10 +12,10 @@ exports.cities = function fetch_cities(){
     .then(data => { return data.result.records })
         .then(city => city.forEach(
             element => {
-                citiesDict[i] = element.שם_ישוב
+                citiesDict[i] = (element.שם_ישוב).substring(0, ((element.שם_ישוב).length)-1)
                 i++
             }))
-
+      
 
     return citiesDict
 }

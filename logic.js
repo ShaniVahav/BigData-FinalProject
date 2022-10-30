@@ -15,21 +15,39 @@ exports.sale = function Sale(citiesArray, holidaysDict)
 {
     /* Random Date */
     let holiday_size = Object.keys(holidaysDict).length;
-    end = new Date()
 
     function randomDate() {
-        let holiday = Math.floor(Math.random() * holiday_size);  // between 0 to 45
-        
-        // if random a "regular number (date)" so random a date from all the year
-        if (holiday == 16 || holiday == 17 || holiday == 18 || holiday == 21 || holiday == 46)
+        let kind_of_day = Math.floor(Math.random() * 7); // 0-2: holiday, 3-5: summer, 6: regular
+
+
+        if (kind_of_day >= 0 && kind_of_day <= 2)  // it's holiday
         {
-            // regular day
-            start = new Date(2021, 0, 1) 
-            var date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-            return date.getFullYear()+'/'+(date.getMonth()+1)+'/' + date.getDate() +" "+ (date.getDay()+1);
+            let holiday = Math.floor(Math.random() * holiday_size);  // between 0 to 45
+            return holidaysDict[holiday]  // special day
         }
 
-        return holidaysDict[holiday]  // special day
+        if (kind_of_day >= 3 && kind_of_day <= 5)  // it's hot day
+        {
+            if (Math.floor(Math.random() * 2) == 0) {
+                start = new Date(2021, 6, 1)
+                end = new Date(2021, 7, 31)
+            }
+            else {
+                start = new Date(2022, 6, 1)
+                end = new Date(2022, 7, 31)
+            }
+
+            var date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+            return date.getFullYear() + '//' + (date.getMonth() + 1) + '//' + date.getDate();
+        }
+
+        else {
+            // regular day
+            start = new Date(2021, 0, 1)
+            end = new Date()
+            var date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+            return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
+        }  
     }
     var _date = randomDate();
 
@@ -75,6 +93,6 @@ exports.sale = function Sale(citiesArray, holidaysDict)
     var _w = randomWeight()
      
 
-    let randomSale = `CityID: "${_city}", Date: "${_date}", City: "${citiesArray[_city]}", Flavour: "${flavour[_flv]}", Weight: ${_w}`;
+    let randomSale = `{"CityID": "${_city}", "Date": "${_date}", "City": "${citiesArray[_city]}", "Flavor": "${flavour[_flv]}", "Weight": ${_w}}`;
     return randomSale
 }

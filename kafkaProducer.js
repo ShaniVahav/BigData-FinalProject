@@ -32,7 +32,7 @@ function send() {
 
     producer.on("ready", function (arg) {
 
-        console.log('producer is ready');
+        console.log('send sale to kafka ..');
 
         sale = create.sale(cities, holidays)
         genMessage = Buffer.from(sale);
