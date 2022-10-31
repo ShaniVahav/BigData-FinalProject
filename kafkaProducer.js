@@ -60,6 +60,4 @@ function send() {
         console.error(err);
         process.exit(1);
     });
-
-   // producer.connect();
 }

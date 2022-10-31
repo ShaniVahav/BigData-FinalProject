@@ -1,24 +1,32 @@
 //*****************************//
 //   Initialize the arrays    //
 //***************************//
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-exports.cities = function fetch_cities(){
-    let cities_url = 'https://data.gov.il/api/3/action/datastore_search?resource_id=5c78e9fa-c2e2-4771-93ff-7f400a12f7ba&limit=101'
-    var citiesDict = {}
-    let i = -1
-    // fetch the cities:
-    fetch(cities_url)
-    .then(res => { return res.json() })
-    .then(data => { return data.result.records })
-        .then(city => city.forEach(
-            element => {
-                citiesDict[i] = (element.שם_ישוב).substring(0, ((element.שם_ישוב).length)-1)
-                i++
-            }))
-      
+var mysql = require('mysql');
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
+exports.cities = function fetch_cities() {
+    var citiesDict = {}
+    let i = 0
+
+    var con = mysql.createConnection({
+    host: "sql7.freemysqlhosting.net",
+    user: "sql7530153",
+    password: "FbANyHrpCD",
+    database: "sql7530153"
+    })
+    con.connect(function (err){
+        if (err) throw err;
+        con.query(`SELECT city_name FROM Cities`, function (err, result, fields) {
+            if (err) throw err;
+            result.forEach(
+                element => {
+                    citiesDict[i] = element.city_name
+                    i++ })
+        });
+    })
     return citiesDict
 }
+
 
 exports.holidays = function fetch_holidays(){
     let holidays_url = 'https://holidayapi.com/v1/holidays?pretty&key=6494e84f-c91d-4794-bbf1-abd52c1d760d&country=IL&year=2021'
@@ -33,7 +41,7 @@ exports.holidays = function fetch_holidays(){
             holidaysArray[i] = element.date
             i++
         }
-        ))
+    ))
 
     return holidaysArray
 }
